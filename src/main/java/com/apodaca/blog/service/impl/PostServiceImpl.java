@@ -9,6 +9,7 @@ import com.apodaca.blog.service.PostService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,17 +44,18 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse getALlPosts(int pageNo, int pageSize) {
+    public PostResponse getALlPosts(int pageNo, int pageSize, String sortBy) {
 
         //create Pageable instance
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+//        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 
         Page<Post> posts = postRepository.findAll(pageable);
 
         //get content from page object
         List<Post> lostOfPosts = posts.getContent();
 //        return lostOfPosts.stream().map(post -> mapToDTO(post)).collect(Collectors.toList());
-        List<PostDto> content =  lostOfPosts.stream().map(this::mapToDTO).collect(Collectors.toList());
+        List<PostDto> content = lostOfPosts.stream().map(this::mapToDTO).collect(Collectors.toList());
 
         PostResponse postResponse = new PostResponse();
         postResponse.setContent(content);
