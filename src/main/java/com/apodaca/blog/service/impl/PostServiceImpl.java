@@ -3,6 +3,7 @@ package com.apodaca.blog.service.impl;
 import com.apodaca.blog.entity.Post;
 import com.apodaca.blog.exception.ResourceNotFoundException;
 import com.apodaca.blog.payload.PostDto;
+import com.apodaca.blog.payload.PostResponse;
 import com.apodaca.blog.repository.PostRepository;
 import com.apodaca.blog.service.PostService;
 import org.springframework.data.domain.Page;
@@ -42,7 +43,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getALlPosts(int pageNo, int pageSize) {
+    public PostResponse getALlPosts(int pageNo, int pageSize) {
 
         //create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize);
@@ -52,7 +53,17 @@ public class PostServiceImpl implements PostService {
         //get content from page object
         List<Post> lostOfPosts = posts.getContent();
 //        return lostOfPosts.stream().map(post -> mapToDTO(post)).collect(Collectors.toList());
-        return lostOfPosts.stream().map(this::mapToDTO).collect(Collectors.toList());
+        List<PostDto> content =  lostOfPosts.stream().map(this::mapToDTO).collect(Collectors.toList());
+
+        PostResponse postResponse = new PostResponse();
+        postResponse.setContent(content);
+        postResponse.setPageNo(posts.getNumber());
+        postResponse.setPageSize(posts.getSize());
+        postResponse.setTotalElements(posts.getTotalElements());
+        postResponse.setTotalPages(posts.getTotalPages());
+        postResponse.setLast(posts.isLast());
+
+        return postResponse;
 
 
     }
