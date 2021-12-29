@@ -2,12 +2,14 @@ package com.apodaca.blog.service.impl;
 
 import com.apodaca.blog.entity.Comment;
 import com.apodaca.blog.entity.Post;
+import com.apodaca.blog.exception.BlogAPIException;
 import com.apodaca.blog.exception.ResourceNotFoundException;
 import com.apodaca.blog.payload.CommentDto;
 import com.apodaca.blog.repository.CommentRepository;
 import com.apodaca.blog.repository.PostRepository;
 import com.apodaca.blog.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,6 +53,23 @@ public class CommentServiceImpl implements CommentService {
         // convert list of comment entities to list of comment dto's
 //        return comments.stream().map(comment -> mapToDTO(comment)).collect(Collectors.toList());
         return comments.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public CommentDto getCommentById(Long postId, Long commentId) {
+        // retrieve post entity by id
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new ResourceNotFoundException("Post", "id", postId));
+
+        // retrieve comment by id
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
+                new ResourceNotFoundException("Comment", "id", commentId));
+
+        if (!comment.getPost().getId().equals(post.getId())) {
+            throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment does not belong to post");
+        }
+
+        return mapToDTO(comment);
     }
 
     private CommentDto mapToDTO(Comment comment) {
