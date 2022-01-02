@@ -20,7 +20,6 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
 @EnableWebSecurity
-//To enable global method security
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -28,7 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private CustomUserDetailsService userDetailsService;
 
     @Bean
-    PasswordEncoder passwordEncoder() {
+    PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
@@ -60,8 +59,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     //    @Override
 //    @Bean
 //    protected UserDetailsService userDetailsService() {
-//        UserDetails eduardo = User.builder().username("eduardo").password(passwordEncoder().encode("123456")).roles("USER").build();
-//        UserDetails admin = User.builder().username("admin").password(passwordEncoder().encode("123456")).roles("ADMIN").build();
-//        return new InMemoryUserDetailsManager(eduardo, admin);
+//        UserDetails ramesh = User.builder().username("ramesh").password(passwordEncoder()
+//                .encode("password")).roles("USER").build();
+//        UserDetails admin = User.builder().username("admin").password(passwordEncoder()
+//                .encode("admin")).roles("ADMIN").build();
+//        return new InMemoryUserDetailsManager(ramesh, admin);
 //    }
 }
