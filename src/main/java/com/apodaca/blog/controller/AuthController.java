@@ -2,10 +2,12 @@ package com.apodaca.blog.controller;
 
 import com.apodaca.blog.entity.Role;
 import com.apodaca.blog.entity.User;
+import com.apodaca.blog.payload.JWTAuthResponse;
 import com.apodaca.blog.payload.LoginDto;
 import com.apodaca.blog.payload.SignUpDto;
 import com.apodaca.blog.repository.RoleRepository;
 import com.apodaca.blog.repository.UserRepository;
+import com.apodaca.blog.security.JwtTokenProvider;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,15 +40,20 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JwtTokenProvider tokenProvider;
+
     @PostMapping("/signin")
-    public ResponseEntity<String> authenticateUser(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getUsernameOrEmail(), loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        // get token form tokenProvider
+        String token = tokenProvider.generateToken(authentication);
 
 
-        return new ResponseEntity<>("User signed-in successfully!", HttpStatus.OK);
+        return ResponseEntity.ok(new JWTAuthResponse(token));
     }
 
     @PostMapping("/signup")
